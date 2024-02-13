@@ -39,6 +39,7 @@ h1 {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   grid-gap: 20px;
+  list-style-type: none;
 }
 .card:hover {
   animation: bounce 0.5s linear;
