@@ -15,12 +15,23 @@ const getPokemons = async () => {
       const results = await pokemonsUrl.json();
       // console.log(results);
 
-      //Empujamos los valores deseados dentro del array creado anteriormente
+      // Empujamos los valores deseados dentro del array creado anteriormente
       pokemonsList.push({
         id: results.id,
         image: results.sprites["front_default"],
         name: results.name,
         type: results.types.map((type) => type.type.name).join(", "),
+        abilities: results.abilities
+          .map((ability) => ability.ability.name)
+          .join(", "),
+        stats: [
+          { hp: results.stats[0].base_stat },
+          { attack: results.stats[1].base_stat },
+          { defense: results.stats[2].base_stat },
+          { specialAttack: results.stats[3].base_stat },
+          { specialDefense: results.stats[4].base_stat },
+          { speed: results.stats[5].base_stat },
+        ],
       });
     } catch (error) {
       console.error("Error en la solicitud");
@@ -53,22 +64,35 @@ const drawPokemons = async () => {
     let cardTitle$$ = document.createElement("h4");
     card$$.appendChild(cardTitle$$);
     cardTitle$$.className = "card-title";
-    cardTitle$$.textContent = pokemon.name;
+    // cardTitle$$.textContent = pokemon.name;
+    cardTitle$$.textContent = `#${pokemon.id} ${pokemon.name}`;
 
     let cardImage$$ = document.createElement("img");
     card$$.appendChild(cardImage$$);
     cardImage$$.className = "card-image";
     cardImage$$.src = pokemon.image;
 
-    let cardId$$ = document.createElement("h3");
-    card$$.appendChild(cardId$$);
-    cardId$$.className = "card-Id";
-    cardId$$.textContent = "ID: " + pokemon.id;
+    // let cardId$$ = document.createElement("h3");
+    // card$$.appendChild(cardId$$);
+    // cardId$$.className = "card-Id";
+    // cardId$$.textContent = "ID: " + pokemon.id;
 
     let cardSubtitle$$ = document.createElement("h3");
     card$$.appendChild(cardSubtitle$$);
     cardSubtitle$$.className = "card-subtitle";
     cardSubtitle$$.textContent = "Type: " + pokemon.type;
+
+    let cardAbilities$$ = document.createElement("p");
+    card$$.appendChild(cardAbilities$$);
+    cardAbilities$$.className = "card-abilities";
+    cardAbilities$$.textContent = "Habilidades: " + pokemon.abilities;
+
+    pokemonsList.stats.map((stat) => {
+      let cardStats$$ = document.createElement("p");
+      card$$.appendChild(cardStats$$);
+      cardStats$$.className = "card-stats";
+      cardStats$$.textContent = "Estadísticas: " + pokemon.stat;
+    });
   });
 };
 
