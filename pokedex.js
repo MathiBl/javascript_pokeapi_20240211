@@ -3,6 +3,7 @@ const baseUrl = "https://pokeapi.co/api/v2/pokemon/";
 
 //Recuperamos el elemento ol con el id 'pokedex' de nuestro html
 let pokedex$$ = document.querySelector("#pokedex");
+let cargando$$ = document.querySelector('#cargando')
 
 //Creamos un array vacío que nos permitirá trabajar los valores deseados
 let pokemonsList = [];
@@ -20,17 +21,18 @@ const getPokemons = async () => {
         id: results.id,
         image: results.sprites["front_default"],
         name: results.name,
+        baseExperience: results.base_experience,
         type: results.types.map((type) => type.type.name).join(", "),
         abilities: results.abilities
           .map((ability) => ability.ability.name)
           .join(", "),
         stats: [
-          { hp: results.stats[0].base_stat },
-          { attack: results.stats[1].base_stat },
-          { defense: results.stats[2].base_stat },
-          { specialAttack: results.stats[3].base_stat },
-          { specialDefense: results.stats[4].base_stat },
-          { speed: results.stats[5].base_stat },
+          { HP: results.stats[0].base_stat },
+          { Attack: results.stats[1].base_stat },
+          { Defense: results.stats[2].base_stat },
+          { "Special attack": results.stats[3].base_stat },
+          { "Special defense": results.stats[4].base_stat },
+          { Speed: results.stats[5].base_stat },
         ],
       });
     } catch (error) {
@@ -45,7 +47,8 @@ const drawPokemons = async () => {
   // console.log(pokemon);
 
   //Recuperamos el resultado del fetch
-  const pokedexData = await getPokemons();
+  await getPokemons();
+  cargando$$.className = "hide";
 
   pokemonsList.map((pokemon) => {
     //También podría usar for (let pokemon of pokemonsList)
@@ -65,17 +68,12 @@ const drawPokemons = async () => {
     card$$.appendChild(cardTitle$$);
     cardTitle$$.className = "card-title";
     // cardTitle$$.textContent = pokemon.name;
-    cardTitle$$.textContent = `#${pokemon.id} ${pokemon.name}`;
+    cardTitle$$.textContent = `#${pokemon.id} ${pokemon.name} ${pokemon.baseExperience}`;
 
     let cardImage$$ = document.createElement("img");
     card$$.appendChild(cardImage$$);
     cardImage$$.className = "card-image";
     cardImage$$.src = pokemon.image;
-
-    // let cardId$$ = document.createElement("h3");
-    // card$$.appendChild(cardId$$);
-    // cardId$$.className = "card-Id";
-    // cardId$$.textContent = "ID: " + pokemon.id;
 
     let cardSubtitle$$ = document.createElement("h3");
     card$$.appendChild(cardSubtitle$$);
@@ -84,16 +82,29 @@ const drawPokemons = async () => {
 
     let cardAbilities$$ = document.createElement("p");
     card$$.appendChild(cardAbilities$$);
-    cardAbilities$$.className = "card-abilities";
+    cardAbilities$$.className = 'hide'
     cardAbilities$$.textContent = "Habilidades: " + pokemon.abilities;
-
-    pokemonsList.stats.map((stat) => {
-      let cardStats$$ = document.createElement("p");
+    
+    let cardStatsTitle$$ = document.createElement("h4");
+    card$$.appendChild(cardStatsTitle$$);
+    cardStatsTitle$$.textContent = "Estadísticas:";
+    cardStatsTitle$$.className = 'hide'
+    let cardStats$$;
+    pokemon.stats.map((stat) => {
+       cardStats$$ = document.createElement("p");
       card$$.appendChild(cardStats$$);
-      cardStats$$.className = "card-stats";
-      cardStats$$.textContent = "Estadísticas: " + pokemon.stat;
+      let index = Object.keys(stat)[0];
+      cardStats$$.textContent = `${index}: ${stat[index]}`;
+      cardStats$$.className = 'hide'
     });
+    let hoverCard = card$$.addEventListener('click', () =>{
+      cardAbilities$$.className = 'show'
+      cardStatsTitle$$.className = 'show'
+      cardStats$$.className = 'show'
+    })
   });
+
+  
 };
 
 //Por último, llamamos a nuestra función drawPokemons

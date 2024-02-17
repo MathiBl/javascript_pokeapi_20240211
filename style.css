@@ -1,5 +1,10 @@
 body {
-  background-color: orangered;
+  background-image: url("bg_img.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+background-attachment: fixed;
+  height: 100%;
   margin: 0;
   font-family: rubik;
   color: white;
@@ -7,7 +12,9 @@ body {
 .container {
   padding: 40px;
   margin: 0 auto;
+ 
 }
+
 h1 {
   text-transform: uppercase;
   text-align: center;
@@ -16,10 +23,14 @@ h1 {
 .card {
   list-style: none;
   padding: 40px;
-  background-color: #f4f4f4;
+  background-color: hsla(0, 0%, 96%, 0.438);
+  border: 7px solid white;
   color: #222;
   text-align: center;
+  border-radius: 50px;
 }
+
+
 .card-title {
   text-transform: uppercase;
   font-size: 32px;
@@ -43,6 +54,8 @@ h1 {
 }
 .card:hover {
   animation: bounce 0.5s linear;
+  border: 7px solid red;
+  background-color: white;
 }
 @keyframes bounce {
   20% {
@@ -57,4 +70,19 @@ h1 {
   80% {
     transform: translateY(-0px);
   }
+}
+
+ #cargando {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+} 
+
+.hide {
+  display: none !important;
+}
+
+.show{
+  display: block;
 }
