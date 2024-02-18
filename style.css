@@ -3,16 +3,16 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-background-attachment: fixed;
+  background-attachment: fixed;
   height: 100%;
   margin: 0;
   font-family: rubik;
   color: white;
 }
+
 .container {
   padding: 40px;
   margin: 0 auto;
- 
 }
 
 h1 {
@@ -20,9 +20,10 @@ h1 {
   text-align: center;
   font-size: 54px;
 }
+
 .card {
   list-style: none;
-  padding: 40px;
+  padding: 10px 30px 10px 30px;
   background-color: hsla(0, 0%, 96%, 0.438);
   border: 7px solid white;
   color: #222;
@@ -30,21 +31,42 @@ h1 {
   border-radius: 50px;
 }
 
-
 .card-title {
   text-transform: uppercase;
   font-size: 32px;
   font-weight: normal;
-  margin-bottom: 0;
+  margin: 0;
 }
+
 .card-subtitle {
   font-weight: lighter;
   color: #666;
   margin-top: 5px;
 }
+
 .card-image {
   height: 180px;
 }
+
+.card-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  font-weight: lighter;
+  color: #666;
+}
+
+.card-stats {
+  background-color: red;
+}
+
+#cargando {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
 #pokedex {
   padding-inline-start: 0;
   display: grid;
@@ -52,11 +74,24 @@ h1 {
   grid-gap: 20px;
   list-style-type: none;
 }
+
 .card:hover {
   animation: bounce 0.5s linear;
   border: 7px solid red;
   background-color: white;
 }
+
+
+.hide {
+  display: none !important;
+  animation: appear 5s;
+}
+
+.show {
+  display: block;
+  animation: appear 0.5s linear;
+}
+
 @keyframes bounce {
   20% {
     transform: translateY(-6px);
@@ -72,17 +107,21 @@ h1 {
   }
 }
 
- #cargando {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-} 
-
-.hide {
-  display: none !important;
+@keyframes appear {
+  10% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.2;
+  }
+  40% {
+    opacity: 0.6;
+    background-color: white;
+  }
+  80% {
+    opacity: 1;
+    background-color: none;
+    color: black;
+  }
 }
 
-.show{
-  display: block;
-}

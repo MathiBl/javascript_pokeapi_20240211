@@ -3,7 +3,6 @@ const baseUrl = "https://pokeapi.co/api/v2/pokemon/";
 
 //Recuperamos el elemento ol con el id 'pokedex' de nuestro html
 let pokedex$$ = document.querySelector("#pokedex");
-let cargando$$ = document.querySelector('#cargando')
 
 //Creamos un array vacío que nos permitirá trabajar los valores deseados
 let pokemonsList = [];
@@ -48,11 +47,13 @@ const drawPokemons = async () => {
 
   //Recuperamos el resultado del fetch
   await getPokemons();
+
+  //Llamamos al elemento "#cargando" que hemos creado en el html y que aparecerá algunos segundos antes de que carguen los pokemons
+  let cargando$$ = document.querySelector("#cargando");
   cargando$$.className = "hide";
 
   pokemonsList.map((pokemon) => {
     //También podría usar for (let pokemon of pokemonsList)
-    // console.log(x);
 
     //Creamos el elemento li y lo relacionamos con su elemento padre (el elemento pokedex de nuestro html)
     let li$$ = document.createElement("li");
@@ -64,11 +65,25 @@ const drawPokemons = async () => {
     card$$.className = "card";
 
     //Dentro de nuestras cartas, dibujamos nuestros pokemons
+
+    //Empezamos por crear un div que contendrá el ID y el XP de cada pokemon
+    let cardHeader$$ = document.createElement("div");
+    card$$.appendChild(cardHeader$$);
+    cardHeader$$.className = "card-header";
+
+    let cardId$$ = document.createElement("h4");
+    cardHeader$$.appendChild(cardId$$);
+    cardId$$.textContent = `# ${pokemon.id}`;
+
+    let cardExp$$ = document.createElement("h4");
+    cardHeader$$.appendChild(cardExp$$);
+    cardExp$$.textContent = `XP: ${pokemon.baseExperience}`;
+
+    //Ahora pintamos el nombre, la imágen y el típo de cada pokemon
     let cardTitle$$ = document.createElement("h4");
     card$$.appendChild(cardTitle$$);
     cardTitle$$.className = "card-title";
-    // cardTitle$$.textContent = pokemon.name;
-    cardTitle$$.textContent = `#${pokemon.id} ${pokemon.name} ${pokemon.baseExperience}`;
+    cardTitle$$.textContent = pokemon.name;
 
     let cardImage$$ = document.createElement("img");
     card$$.appendChild(cardImage$$);
@@ -80,31 +95,41 @@ const drawPokemons = async () => {
     cardSubtitle$$.className = "card-subtitle";
     cardSubtitle$$.textContent = "Type: " + pokemon.type;
 
+    //Seguimos con la habilidades y las estadísticas de cada uno. Esos datos aparecerán solo con un mouseover
     let cardAbilities$$ = document.createElement("p");
     card$$.appendChild(cardAbilities$$);
-    cardAbilities$$.className = 'hide'
+    cardAbilities$$.className = "hide";
     cardAbilities$$.textContent = "Habilidades: " + pokemon.abilities;
-    
+
     let cardStatsTitle$$ = document.createElement("h4");
     card$$.appendChild(cardStatsTitle$$);
+    cardStatsTitle$$.className = "hide";
     cardStatsTitle$$.textContent = "Estadísticas:";
-    cardStatsTitle$$.className = 'hide'
-    let cardStats$$;
+
     pokemon.stats.map((stat) => {
-       cardStats$$ = document.createElement("p");
+      let cardStats$$ = document.createElement("p");
       card$$.appendChild(cardStats$$);
       let index = Object.keys(stat)[0];
       cardStats$$.textContent = `${index}: ${stat[index]}`;
-      cardStats$$.className = 'hide'
+      cardStats$$.className = "card-stats hide";
     });
-    let hoverCard = card$$.addEventListener('click', () =>{
-      cardAbilities$$.className = 'show'
-      cardStatsTitle$$.className = 'show'
-      cardStats$$.className = 'show'
-    })
-  });
 
-  
+    //Creamos un addEventListener. Le pedimos que nos enseñe las habilidades y las estadísticas al pasar el ratón y que las esconde al quitar el ratón
+    card$$.addEventListener("mouseover", (x) => {
+      cardAbilities$$.className = "show";
+      cardStatsTitle$$.className = "show";
+      card$$.querySelectorAll("p").className = "show";
+      let stats = Array.from(card$$.getElementsByTagName("p"));
+      stats.map((x) => (x.className = "show"));
+    });
+    card$$.addEventListener("mouseout", (x) => {
+      cardAbilities$$.className = "hide";
+      cardStatsTitle$$.className = "hide";
+      card$$.querySelectorAll("p").className = "hide";
+      let stats = Array.from(card$$.getElementsByTagName("p"));
+      stats.map((x) => (x.className = "hide"));
+    });
+  });
 };
 
 //Por último, llamamos a nuestra función drawPokemons
