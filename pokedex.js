@@ -1,74 +1,97 @@
-//Creamos la constante baseRL y le asignamos la url de la api
+//Creamos la constante baseUrl y le asignamos la url de la api
 const baseUrl = "https://pokeapi.co/api/v2/pokemon/";
 
-//Recuperamos el elemento ol con el id 'pokedex' de nuestro html
+//Recuperamos los elementos de nuestro html
 let pokedex$$ = document.querySelector("#pokedex");
+let cargando$$ = document.querySelector("#cargando");
+let searchContainer$$ = document.querySelector("#search-container");
 
 //Creamos un array vacío que nos permitirá trabajar los valores deseados
 let pokemonsList = [];
+let filteredPokemons = [];
+
+//Escondemos el input y la Pokédex al inicio
+searchContainer$$.classList.add("hide");
+pokedex$$.classList.add("hide");
 
 //Creamos una función asíncrona para ejecutar el fetch y recuperar los 150 pokemons a través de un bucle
 const getPokemons = async () => {
   for (let i = 1; i <= 150; i++) {
     try {
-      const pokemonsUrl = await fetch(`${baseUrl}${i}`);
-      const results = await pokemonsUrl.json();
-      // console.log(results);
+      const response = await fetch(`${baseUrl}${i}`);
+      const pokemon = await response.json();
 
       // Empujamos los valores deseados dentro del array creado anteriormente
       pokemonsList.push({
-        id: results.id,
-        image: results.sprites["front_default"],
-        name: results.name,
-        baseExperience: results.base_experience,
-        type: results.types.map((type) => type.type.name).join(", "),
-        abilities: results.abilities
+        id: pokemon.id,
+        image: pokemon.sprites.other["official-artwork"].front_default,
+        name: pokemon.name,
+        baseExperience: pokemon.base_experience,
+        type: pokemon.types.map((type) => type.type.name).join(", "),
+        abilities: pokemon.abilities
           .map((ability) => ability.ability.name)
           .join(", "),
         stats: [
-          { HP: results.stats[0].base_stat },
-          { Attack: results.stats[1].base_stat },
-          { Defense: results.stats[2].base_stat },
-          { "Special attack": results.stats[3].base_stat },
-          { "Special defense": results.stats[4].base_stat },
-          { Speed: results.stats[5].base_stat },
+          { HP: pokemon.stats[0].base_stat },
+          { Attack: pokemon.stats[1].base_stat },
+          { Defense: pokemon.stats[2].base_stat },
+          { "Special attack": pokemon.stats[3].base_stat },
+          { "Special defense": pokemon.stats[4].base_stat },
+          { Speed: pokemon.stats[5].base_stat },
         ],
       });
     } catch (error) {
       console.error("Error en la solicitud");
     }
   }
-  console.log(pokemonsList);
+  filteredPokemons = pokemonsList;
+  cargando$$.classList.add("hide"); // Oculta el div de carga
+  searchContainer$$.classList.remove("hide"); // Muestra el input de búsqueda
+  pokedex$$.classList.remove("hide"); // Muestra la Pokédex
+  drawPokemons(filteredPokemons);
 };
 
-//Creamos una nueva función asíncrona para pintar los Pokemons
-const drawPokemons = async () => {
-  // console.log(pokemon);
+// Creamos y dibujamos el input de búsqueda
+const drawInput = () => {
+  const input$$ = document.querySelector("input");
+  input$$.addEventListener("input", () => {
+    searchPokemons(input$$.value);
+  });
+};
 
-  //Recuperamos el resultado del fetch
-  await getPokemons();
+// Función para filtrar los Pokémon
+const searchPokemons = (filtro) => {
+  filteredPokemons = pokemonsList.filter((pokemon) =>
+    pokemon.name.toLowerCase().includes(filtro.toLowerCase())
+  );
+  drawPokemons(filteredPokemons);
+};
 
-  //Llamamos al elemento "#cargando" que hemos creado en el html y que aparecerá algunos segundos antes de que carguen los pokemons
-  let cargando$$ = document.querySelector("#cargando");
-  cargando$$.className = "hide";
-
-  pokemonsList.map((pokemon) => {
-    //También podría usar for (let pokemon of pokemonsList)
-
-    //Creamos el elemento li y lo relacionamos con su elemento padre (el elemento pokedex de nuestro html)
+// Función para dibujar los Pokémon
+const drawPokemons = (pokemons) => {
+  pokedex$$.innerHTML = ""; // Borra la lista anterior
+  pokemons.forEach((pokemon) => {
     let li$$ = document.createElement("li");
     pokedex$$.appendChild(li$$);
 
-    //Creamos nuestras cartas y lo relacionamos con su elemento padre li
     let card$$ = document.createElement("div");
     li$$.appendChild(card$$);
-    card$$.className = "card";
+    card$$.className = "flip-card";
 
-    //Dentro de nuestras cartas, dibujamos nuestros pokemons
+    let flipCardInner$$ = document.createElement("div");
+    flipCardInner$$.className = "flip-card-inner";
+    card$$.appendChild(flipCardInner$$);
 
-    //Empezamos por crear un div que contendrá el ID y el XP de cada pokemon
+    let flipCardFront$$ = document.createElement("div");
+    flipCardFront$$.className = "flip-card-front";
+    flipCardInner$$.appendChild(flipCardFront$$);
+
+    let flipCardBack$$ = document.createElement("div");
+    flipCardBack$$.className = "flip-card-back hide";
+    flipCardInner$$.appendChild(flipCardBack$$);
+
     let cardHeader$$ = document.createElement("div");
-    card$$.appendChild(cardHeader$$);
+    flipCardFront$$.appendChild(cardHeader$$);
     cardHeader$$.className = "card-header";
 
     let cardId$$ = document.createElement("h4");
@@ -79,64 +102,63 @@ const drawPokemons = async () => {
     cardHeader$$.appendChild(cardExp$$);
     cardExp$$.textContent = `XP: ${pokemon.baseExperience}`;
 
-    //Ahora pintamos el nombre, la imágen y el típo de cada pokemon
     let cardTitle$$ = document.createElement("h4");
-    card$$.appendChild(cardTitle$$);
+    flipCardFront$$.appendChild(cardTitle$$);
     cardTitle$$.className = "card-title";
     cardTitle$$.textContent = pokemon.name;
 
     let cardImage$$ = document.createElement("img");
-    card$$.appendChild(cardImage$$);
+    flipCardFront$$.appendChild(cardImage$$);
     cardImage$$.className = "card-image";
     cardImage$$.src = pokemon.image;
 
     let cardSubtitle$$ = document.createElement("h3");
-    card$$.appendChild(cardSubtitle$$);
+    flipCardFront$$.appendChild(cardSubtitle$$);
     cardSubtitle$$.className = "card-subtitle";
     cardSubtitle$$.textContent = "Type: " + pokemon.type;
 
-    //Seguimos con la habilidades y las estadísticas de cada uno. Esos datos aparecerán solo con un mouseover
+    let cardAbilitiesTitle$$ = document.createElement("h4");
+    flipCardBack$$.appendChild(cardAbilitiesTitle$$);
+    cardAbilitiesTitle$$.className = "title-back show";
+    cardAbilitiesTitle$$.textContent = "Habilidades:";
+
     let cardAbilities$$ = document.createElement("p");
-    card$$.appendChild(cardAbilities$$);
-    cardAbilities$$.className = "hide";
-    cardAbilities$$.textContent = "Habilidades: " + pokemon.abilities;
+    flipCardBack$$.appendChild(cardAbilities$$);
+    cardAbilities$$.className = "p-back show";
+    cardAbilities$$.textContent = pokemon.abilities;
 
     let cardStatsTitle$$ = document.createElement("h4");
-    card$$.appendChild(cardStatsTitle$$);
-    cardStatsTitle$$.className = "hide";
+    flipCardBack$$.appendChild(cardStatsTitle$$);
+    cardStatsTitle$$.className = "title-back show";
     cardStatsTitle$$.textContent = "Estadísticas:";
 
-    pokemon.stats.map((stat) => {
+    pokemon.stats.forEach((stat) => {
       let cardStats$$ = document.createElement("p");
-      card$$.appendChild(cardStats$$);
+      flipCardBack$$.appendChild(cardStats$$);
       let index = Object.keys(stat)[0];
       cardStats$$.textContent = `${index}: ${stat[index]}`;
-      cardStats$$.className = "card-stats hide";
+      cardStats$$.className = "p-back show";
     });
 
-    //Creamos un addEventListener. Le pedimos que nos enseñe las habilidades y las estadísticas al pasar el ratón y que las esconde al quitar el ratón
-    card$$.addEventListener("mouseover", (x) => {
-      cardAbilities$$.className = "show";
-      cardStatsTitle$$.className = "show";
-      card$$.querySelectorAll("p").className = "show";
-      let stats = Array.from(card$$.getElementsByTagName("p"));
-      stats.map((x) => (x.className = "show"));
+    card$$.addEventListener("mouseover", () => {
+      flipCardFront$$.className = "flip-card-front hide";
+      flipCardBack$$.className = "flip-card-back show";
     });
-    card$$.addEventListener("mouseout", (x) => {
-      cardAbilities$$.className = "hide";
-      cardStatsTitle$$.className = "hide";
-      card$$.querySelectorAll("p").className = "hide";
-      let stats = Array.from(card$$.getElementsByTagName("p"));
-      stats.map((x) => (x.className = "hide"));
+
+    card$$.addEventListener("mouseout", () => {
+      flipCardFront$$.className = "flip-card-front show";
+      flipCardBack$$.className = "flip-card-back hide";
     });
   });
 };
 
-//Por último, llamamos a nuestra función drawPokemons
-drawPokemons();
+// Inicializa las funciones
+const init = async () => {
+  cargando$$.classList.remove("hide"); // Muestra el div de carga
+  setTimeout(async () => {
+    await getPokemons();
+    drawInput();
+  }, 100); // Espera 100 ms antes de iniciar la carga de Pokémon
+};
 
-//También podríamos crear una función que sería como nuestra hoja de ruta, en la que almacenaríamos las diferentes funciones que necesitamos llamar (si fuese el caso), y así tendríamos que hacer una sola llamada
-// const init = async () => {
-// };
-
-// init();
+init();
